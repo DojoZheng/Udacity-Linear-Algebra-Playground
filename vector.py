@@ -11,6 +11,7 @@ class Vector(object):
                 raise ValueError
             self.coordinates = tuple([Decimal(x) for x in coordinates])
             self.dimension = len(self.coordinates)
+            self.CANNOT_NORMALIZE_ZERO_VECTOR_MSG = 'CANNOT_NORMALIZE_ZERO_VECTOR_MSG'
 
         except ValueError:
             raise ValueError('The coordinates must be nonempty')
@@ -77,6 +78,18 @@ class Vector(object):
     	else:
     		raise e
 
+    def is_zero(self, tolerance=1e-10):
+    	return self.magnitude() < tolerance
+
+    def is_orthogonal_to(self, v, tolerance=1e-10):
+    	return abs(self.dot(v)) < tolerance
+
+    def is_parallel_to(self, v, tolerance=1e-10):
+    	return (self.is_zero() or
+    			v.is_zero() or
+                abs(self.angle_with(v) - 0) < tolerance or
+                abs(self.angle_with(v) - pi) < tolerance)
+
 # 1. test
 my_vector = Vector([1, 2, 3])
 print my_vector
@@ -112,7 +125,15 @@ print("v.w = " + str(v.dot(w)))
 v = Vector(['3.183', '-7.627'])
 w = Vector(['-2.668', '5.319'])
 print ("v angle with w:" + str(v.angle_with(w)))
-
 print('\n')
 
+# 5. Parallel & Orthogonal
+# v = Vector(['-7.579', '-7.88'])
+# w = Vector(['22.737', '23.64'])
+v = Vector(['1', '0'])
+w = Vector(['1', '0'])
+print v
+print w
+print 'is parallel :', v.is_parallel_to(w)
+print 'is orthogonal :', v.is_orthogonal_to(w)
 
