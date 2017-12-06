@@ -1,3 +1,5 @@
+from math import sqrt
+
 class Vector(object):
 
     def __init__(self, coordinates):
@@ -38,6 +40,18 @@ class Vector(object):
         new_coordinates = [c*x for x in self.coordinates]
         return Vector(new_coordinates)
 
+    # define Magnitude & Direction
+    def magnitude(self):
+    	coordinates_squared = [x**2 for x in self.coordinates]
+    	return sqrt(sum(coordinates_squared))
+
+    def normalized(self):
+    	try:
+    		magnitude = self.magnitude()
+    		return self.times_scalar(1./magnitude)
+
+    	except ZeroDivisionError:
+    		raise Exception("Cannot normalize the zero Vector")
 
 # 1. test
 my_vector = Vector([1, 2, 3])
@@ -55,3 +69,12 @@ w = Vector([-1.129, 2.111])
 print v.plus(w)
 print v.minus(w)
 print v.times_scalar(2)
+
+# 3. Magnitude & Direction
+v = Vector([-0.221, 7.437])
+print ("Magnitude(-0.221, 7.437) = " + str(v.magnitude()))
+
+v = Vector([5.581, -2.136])
+print ("Normalized([5.581, -2.136]) = " + str(v.normalized()))
+
+
