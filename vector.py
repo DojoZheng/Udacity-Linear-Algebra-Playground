@@ -12,7 +12,7 @@ class Vector(object):
             self.coordinates = tuple([Decimal(x) for x in coordinates])
             self.dimension = len(self.coordinates)
             self.CANNOT_NORMALIZE_ZERO_VECTOR_MSG = 'CANNOT_NORMALIZE_ZERO_VECTOR_MSG'
-
+            self.NO_UNIQUE_PARALLEL_COMPONENT_MSG = 'NO_UNIQUE_PARALLEL_COMPONENT_MSG'
         except ValueError:
             raise ValueError('The coordinates must be nonempty')
 
@@ -112,6 +112,30 @@ class Vector(object):
     		else:
     			raise e
 
+    def cross(self, v):
+    	try:
+    		x1, y1, z1 = self.coordinates
+    		x2, y2, z2 = v.coordinates
+    		new_coordinates = [y1*z2 - y2*z1, -(x1*z2 - x2*z1), x1*y2 - x2*y1]
+    		return Vector(new_coordinates)
+    	except Exception as e:
+    		msg = str(e)
+    		if msg == 'need more than 2 values to unpack':
+    			self_embedded_in_R3 = Vector(self.coordinates + ('0',))
+    			v_embedded_in_R3 = Vector(v.coordinates + ('0',))
+    			return self_embedded_in_R3.cross(v_embedded_in_R3)
+    		elif (msg == 'too many values to unpack' or msg == 'need more than 1 value to unpack'):
+    			raise Exception(self.ONLY_DEFINE_IN_TWO_THREE_DIMS_MSG)
+    		else:
+    			raise e
+
+    def area_of_parallelogram_with(self, v):
+    	cross_product = self.cross(v)
+    	return cross_product.magnitude()
+
+    def area_of_triangle_with(self, v):
+    	return self.area_of_parallelogram_with(v) / 2.0
+
 
 # 1. test
 my_vector = Vector([1, 2, 3])
@@ -185,3 +209,17 @@ vpar = v.component_parallel_to(w)
 vort = v.component_orthogonal_to(w)
 print 'parallel component:', vpar
 print 'orthogonal component:', vort
+
+# 7. Cross Products
+print '\nCross Products'
+v = Vector(['8.462', '7.839', '-8.187'])
+w = Vector(['6.984', '-5.975', '4.778'])
+print '#1:', v.cross(w)
+
+v = Vector(['-8.987', '-9.838', '5.031'])
+w = Vector(['-4.268', '-1.861', '-8.866'])
+print '#2:', v.area_of_parallelogram_with(w)
+
+v = Vector(['1.5', '9.547', '3.691'])
+w = Vector(['-6.007', '0.124', '5.772'])
+print '#3:', v.area_of_triangle_with(w)
