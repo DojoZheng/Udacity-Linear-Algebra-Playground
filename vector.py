@@ -136,6 +136,7 @@ class Vector(object):
     def area_of_triangle_with(self, v):
     	return self.area_of_parallelogram_with(v) / 2.0
 
+'''
 
 # 1. test
 my_vector = Vector([1, 2, 3])
@@ -223,3 +224,5 @@ print '#2:', v.area_of_parallelogram_with(w)
 v = Vector(['1.5', '9.547', '3.691'])
 w = Vector(['-6.007', '0.124', '5.772'])
 print '#3:', v.area_of_triangle_with(w)
+
+'''
