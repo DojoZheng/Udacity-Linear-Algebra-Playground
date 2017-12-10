@@ -25,6 +25,19 @@ class Vector(object):
     def __eq__(self, v):
         return self.coordinates == v.coordinates
 
+    # def __iter__(self):
+    #     return self
+
+    # def next(self):
+    #     for x in self.coordinates:
+    #         return x
+
+    def __getitem__(self, i):
+        if i < len(self.coordinates):
+            return self.coordinates[i]
+        else:
+            raise Exception("Vector __getitem__ out of critical value")
+
     # Operating on Vectors
     def plus(self, v):
         new_coordinates = [x+y for x,
