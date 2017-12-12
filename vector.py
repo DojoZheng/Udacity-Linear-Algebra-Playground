@@ -1,7 +1,7 @@
 from math import sqrt, acos, pi
 from decimal import Decimal, getcontext
 
-getcontext().prec = 10
+getcontext().prec = 30
 
 class Vector(object):
 
@@ -25,16 +25,20 @@ class Vector(object):
     def __eq__(self, v):
         return self.coordinates == v.coordinates
 
-    # def __iter__(self):
-    #     return self
+    def __iter__(self):
+        return self
 
-    # def next(self):
-    #     for x in self.coordinates:
-    #         return x
+    def next(self):
+       self.idx += 1
+       try:
+           return Decimal(self.coordinates[self.idx-1])
+       except IndexError:
+           self.idx = 0
+           raise StopIteration  # Done iterating.
 
     def __getitem__(self, i):
         if i < len(self.coordinates):
-            return self.coordinates[i]
+            return Decimal(self.coordinates[i])
         else:
             raise Exception("Vector __getitem__ out of critical value")
 

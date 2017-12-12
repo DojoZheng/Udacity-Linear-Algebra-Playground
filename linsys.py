@@ -16,6 +16,7 @@ class LinearSystem(object):
     def __init__(self, planes):
         try:
             d = planes[0].dimension
+            # Make sure the all planes in the system live in the same dimension
             for p in planes:
                 assert p.dimension == d
 
