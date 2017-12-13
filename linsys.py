@@ -76,6 +76,49 @@ class LinearSystem(object):
 
         return indices
 
+    def compute_triangular_form(self):
+        system = deepcopy(self)
+
+        num_equations = len(system)
+        num_variables = system.dimension
+
+        column = 0
+        for row in range(num_equations):
+            while column < num_variables:
+                coefficient = MyDecimal(system[row].normal_vector[column])
+                if coefficient.is_near_zero():
+                    swap_succeeded = system.swap_with_row_below_for_nonzero_coefficient_if_able(row, column)
+                    if not swap_succeeded:
+                        column += 1
+                        continue
+
+                system.clear_coefficients_below(row, column)
+                column += 1
+                break
+
+        return system
+
+    def swap_with_row_below_for_nonzero_coefficient_if_able(self, row, col):
+        num_equations = len(self)
+
+        for k in range(row+1, num_equations):
+            coefficient = MyDecimal(self[k].normal_vector[col])
+            if not coefficient.is_near_zero():
+                self.swap_rows(row, k)
+                return True
+
+        return False
+
+    def clear_coefficients_below(self, row, col):
+        num_equations = len(self)
+        beta = MyDecimal(self[row].normal_vector[col])
+
+        for k in range(row+1, num_equations):
+            n = self[k].normal_vector
+            gamma = n[col]
+            alpha = -gamma/beta
+            self.add_multiple_times_row_to_row(alpha, row, k)
+
 
     def __len__(self):
         return len(self.planes)
@@ -106,6 +149,8 @@ class MyDecimal(Decimal):
         return abs(self) < eps
 
 
+'''
+# Test Cases
 p0 = Plane(normal_vector=Vector(['1','1','1']), constant_term='1')
 p1 = Plane(normal_vector=Vector(['0','1','0']), constant_term='2')
 p2 = Plane(normal_vector=Vector(['1','1','-1']), constant_term='3')
@@ -123,8 +168,10 @@ print s
 
 print MyDecimal('1e-9').is_near_zero()
 print MyDecimal('1e-10').is_near_zero()
+'''
 
-# Test Cases
+'''
+# Test Cases - Row Calculations
 p0 = Plane(normal_vector=Vector(['1','1','1']), constant_term='1')
 p1 = Plane(normal_vector=Vector(['0','1','0']), constant_term='2')
 p2 = Plane(normal_vector=Vector(['1','1','-1']), constant_term='3')
@@ -187,3 +234,43 @@ if not (s[0] == Plane(normal_vector=Vector(['-10','-10','-10']), constant_term='
         s[2] == Plane(normal_vector=Vector(['-1','-1','1']), constant_term='-3') and
         s[3] == p3):
     print 'test case 9 failed'
+'''
+
+# Test Cases - Triangular Form 
+p1 = Plane(normal_vector=Vector(['1','1','1']), constant_term='1')
+p2 = Plane(normal_vector=Vector(['0','1','1']), constant_term='2')
+s = LinearSystem([p1,p2])
+t = s.compute_triangular_form()
+if not (t[0] == p1 and
+        t[1] == p2):
+    print 'test case 1 failed'
+
+p1 = Plane(normal_vector=Vector(['1','1','1']), constant_term='1')
+p2 = Plane(normal_vector=Vector(['1','1','1']), constant_term='2')
+s = LinearSystem([p1,p2])
+t = s.compute_triangular_form()
+if not (t[0] == p1 and
+        t[1] == Plane(constant_term='1')):
+    print 'test case 2 failed'
+
+p1 = Plane(normal_vector=Vector(['1','1','1']), constant_term='1')
+p2 = Plane(normal_vector=Vector(['0','1','0']), constant_term='2')
+p3 = Plane(normal_vector=Vector(['1','1','-1']), constant_term='3')
+p4 = Plane(normal_vector=Vector(['1','0','-2']), constant_term='2')
+s = LinearSystem([p1,p2,p3,p4])
+t = s.compute_triangular_form()
+if not (t[0] == p1 and
+        t[1] == p2 and
+        t[2] == Plane(normal_vector=Vector(['0','0','-2']), constant_term='2') and
+        t[3] == Plane()):
+    print 'test case 3 failed'
+
+p1 = Plane(normal_vector=Vector(['0','1','1']), constant_term='1')
+p2 = Plane(normal_vector=Vector(['1','-1','1']), constant_term='2')
+p3 = Plane(normal_vector=Vector(['1','2','-5']), constant_term='3')
+s = LinearSystem([p1,p2,p3])
+t = s.compute_triangular_form()
+if not (t[0] == Plane(normal_vector=Vector(['1','-1','1']), constant_term='2') and
+        t[1] == Plane(normal_vector=Vector(['0','1','1']), constant_term='1') and
+        t[2] == Plane(normal_vector=Vector(['0','0','-9']), constant_term='-2')):
+    print 'test case 4 failed'
