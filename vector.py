@@ -11,6 +11,8 @@ class Vector(object):
                 raise ValueError
             self.coordinates = tuple([Decimal(x) for x in coordinates])
             self.dimension = len(self.coordinates)
+            self.idx = 0
+
             self.CANNOT_NORMALIZE_ZERO_VECTOR_MSG = 'CANNOT_NORMALIZE_ZERO_VECTOR_MSG'
             self.NO_UNIQUE_PARALLEL_COMPONENT_MSG = 'NO_UNIQUE_PARALLEL_COMPONENT_MSG'
         except ValueError:
@@ -75,7 +77,7 @@ class Vector(object):
     		raise Exception(self.CANNOT_NORMALIZE_ZERO_VECTOR_MSG)
 
     def dot(self, v):
-    	return sum([x*y for x,y in zip(self.coordinates, v.coordinates)])
+    	return sum([(x*y) for x,y in zip(self.coordinates, v.coordinates)])
 
     def angle_with(self, v, in_degrees = False):
     	try:
@@ -102,10 +104,14 @@ class Vector(object):
     	return abs(self.dot(v)) < tolerance
 
     def is_parallel_to(self, v, tolerance=1e-10):
+        u1 = self.normalized()
+        u2 = v.normalized()
+        diff = u1.minus(u2)
+        diff_plus = u1.plus(u2)
     	return (self.is_zero() or
     			v.is_zero() or
-                abs(self.angle_with(v) - 0) < tolerance or
-                abs(self.angle_with(v) - pi) < tolerance)
+                diff.is_zero() or
+                diff_plus.is_zero())
 
     def component_parallel_to(self, basis):
     	try:
