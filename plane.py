@@ -115,9 +115,14 @@ class Plane(object):
 
     @staticmethod
     def first_nonzero_index(iterable):
-        for k, item in enumerate(iterable):
-            if not MyDecimal(item).is_near_zero():
-                return k
+        index = 0
+        for index in range(iterable.dimension):
+            if not MyDecimal(iterable[index]).is_near_zero():
+                return index
+            index += 1
+        # for k, item in enumerate(iterable):
+        #     if not MyDecimal(item).is_near_zero():
+        #         return k
         raise Exception(Plane.NO_NONZERO_ELTS_FOUND_MSG)
 
 

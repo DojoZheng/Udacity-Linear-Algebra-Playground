@@ -31,9 +31,10 @@ class Vector(object):
         return self
 
     def next(self):
-       self.idx += 1
        try:
-           return Decimal(self.coordinates[self.idx-1])
+            value = Decimal(self.coordinates[self.idx])
+            self.idx += 1
+            return value
        except IndexError:
            self.idx = 0
            raise StopIteration  # Done iterating.
